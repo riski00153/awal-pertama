@@ -22,6 +22,10 @@
             from { background: #ffeeba; color: #232946; }
             to { background: #bfa13b; color: #fff; }
         }
+        @keyframes fadeQuotes {
+            from { opacity: 0; transform: translateY(-10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
         html, body {
             height: 100%;
             width: 100%;
@@ -37,6 +41,48 @@
             min-height: 100vh;
             font-family: 'Segoe UI', Arial, sans-serif;
             transition: background 0.7s cubic-bezier(.4,2,.6,1);
+        }
+        .quotes-box {
+            width: 90%;
+            margin: 24px auto 0 auto;
+            text-align: center;
+            background: rgba(255,255,255,0.45);
+            border-radius: 14px;
+            box-shadow: 0 2px 12px #ffeeba55;
+            padding: 18px 10px 12px 10px;
+            animation: fadeQuotes 0.8s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .quotes-text {
+            font-size: 1.13em;
+            font-style: italic;
+            color: #232946;
+            min-height: 32px;
+            transition: color 0.3s;
+            letter-spacing: 0.2px;
+            line-height: 1.5;
+            animation: fadeQuotes 0.8s;
+        }
+        .quotes-btn {
+            margin-top: 2px;
+            padding: 4px 18px;
+            border-radius: 8px;
+            border: 1px solid #e2c976;
+            background: #fffbe7;
+            color: #232946;
+            font-size: 1em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 6px #ffeeba33;
+        }
+        .quotes-btn:hover {
+            background: #ffeeba;
+            color: #bfa13b;
+            box-shadow: 0 2px 12px #ffeeba;
         }
         table, .filter-bar, .search-bar {
             background: rgba(255, 255, 255, 0.25);
@@ -57,7 +103,7 @@
             transition: box-shadow 0.4s, background 0.4s;
         }
         @media (max-width: 700px) {
-            #jadwalTable, .filter-bar, .search-bar { width: 98%; }
+            #jadwalTable, .filter-bar, .search-bar, .quotes-box { width: 98%; }
             #jadwalTable { width: 700px; min-width: 700px; }
             th, td { font-size: 0.95em; }
             #loginForm { min-width:180px; }
@@ -378,6 +424,10 @@
     </div>
     <div id="toast">Login Berhasil! <button class="close-toast" title="Tutup">&times;</button></div>
     <h3 align="center">Jadwal Kuliah</h3>
+    <div class="quotes-box">
+        <span id="quotesText" class="quotes-text"></span>
+        <button id="nextQuotes" class="quotes-btn" title="Ganti Quotes">Ganti Quotes</button>
+    </div>
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Cari kode, mata kuliah, atau dosen...">
         <button class="reset-btn" id="resetSearch" title="Reset Pencarian">✕</button>
@@ -732,6 +782,43 @@
 
     setInterval(updateTable, 60000);
     updateTable();
-</script>
+
+    const quotesList = [
+        "Code never lies, comments sometimes do.",
+        "Belajar ngoding itu kayak naik sepeda, jatuh dulu baru bisa jalan.",
+        "Jangan takut error, error itu guru terbaik programmer.",
+        "Setiap bug adalah peluang untuk belajar hal baru.",
+        "Keep calm and debug the code.",
+        "Ngoding hari ini, sukses esok hari.",
+        "Semua bisa ngoding, asal mau belajar dan pantang menyerah.",
+        "Progress kecil tiap hari lebih baik daripada nunggu sempurna.",
+        "Dream big, code hard.",
+        "Jangan cuma jadi pengguna teknologi, jadilah pencipta teknologi.",
+        "Satu-satunya cara untuk gagal adalah berhenti mencoba.",
+        "Kerja keras mengalahkan bakat ketika bakat tidak bekerja keras.",
+        "Belajar algoritma, bukan cuma bahasa pemrograman.",
+        "Debugging: Mengubah error menjadi ilmu.",
+        "Bukan seberapa cepat kamu ngoding, tapi seberapa paham kamu sama logikanya."
+    ];
+
+    const quotesText = document.getElementById('quotesText');
+    const nextQuotes = document.getElementById('nextQuotes');
+    let lastQuotesIdx = -1;
+
+    function showRandomQuotes() {
+        let idx;
+        do {
+            idx = Math.floor(Math.random() * quotesList.length);
+        } while (idx === lastQuotesIdx);
+        lastQuotesIdx = idx;
+        quotesText.style.opacity = 0;
+        setTimeout(() => {
+            quotesText.textContent = quotesList[idx];
+            quotesText.style.opacity = 1;
+        }, 200);
+    }
+    nextQuotes.onclick = showRandomQuotes;
+    showRandomQuotes();
+    </script>
 </body>
 </html>
