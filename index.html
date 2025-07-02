@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jadwal Kuliah</title>
     <style>
+        html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
         body {
             background: linear-gradient(-45deg, #e0eafc, #cfdef3, #ffeeba, #bfa13b);
             background-size: 400% 400%;
@@ -95,7 +103,6 @@
             letter-spacing: 1px;
             transition: color 0.3s;
         }
-        /* Login overlay */
         #loginBox {
             position:fixed;
             top:0;left:0;width:100vw;height:100vh;
@@ -114,7 +121,6 @@
         #loginForm input {padding:8px;border-radius:6px;border:1px solid #e2c976;}
         #loginForm button {padding:8px;border-radius:6px;background:#e2c976;border:none;font-weight:bold;cursor:pointer;}
         #loginError {color:#ffb3b3;display:none;font-size:0.9em;text-align:center;}
-        /* Toast notification */
         #toast {
             display:none;
             position:fixed;
@@ -129,7 +135,6 @@
             z-index:999;
             font-size:1.1em;
         }
-        /* Floating Action Button */
         .fab {
             position:fixed;
             right:24px;
@@ -148,14 +153,11 @@
             z-index:1000;
             transition: background 0.2s, color 0.2s;
         }
-        /* Responsive */
         @media (max-width: 700px) {
             #jadwalTable, .filter-bar, .search-bar { width: 98%; }
             th, td { font-size: 0.95em; }
             #loginForm { min-width:180px; }
-        }
-        /* Highlight jadwal hari ini */
-        .today-row {
+        }.today-row {
             background: #bfa13b !important;
             color: #fff;
             font-weight: bold;
@@ -168,7 +170,6 @@
     </style>
 </head>
 <body>
-    <!-- Login Overlay -->
     <div id="loginBox">
         <form id="loginForm">
             <h3>Login Jadwal Kuliah</h3>
@@ -178,7 +179,6 @@
             <span id="loginError">Nama atau password salah!</span>
         </form>
     </div>
-    <!-- Toast Notification -->
     <div id="toast">Login Berhasil!</div>
 
     <h3 align="center">Jadwal Kuliah</h3>
@@ -332,16 +332,13 @@
     <div style="width:90%;margin:auto;">
         <h5 id="totalSKS" style="margin:8px 0 0 0;">Total SKS : 23</h5>
     </div>
-    <!-- Floating Action Button -->
     <div class="fab" id="fabTop" title="Kembali ke atas">↑</div>
     <script>
-        // Dark mode otomatis
         const hour = new Date().getHours();
         if (hour >= 18 || hour < 6) {
             document.body.style.background = "linear-gradient(-45deg, #232946, #1a1a2e, #232946, #232946)";
         }
 
-        // Login logic
         const loginBox = document.getElementById('loginBox');
         const loginForm = document.getElementById('loginForm');
         const loginError = document.getElementById('loginError');
@@ -368,7 +365,6 @@
         };
         document.body.style.overflow = "hidden";
 
-        // Filter jadwal & hitung SKS & search
         const filter = document.getElementById('filterHari');
         const searchInput = document.getElementById('searchInput');
         const rows = document.querySelectorAll('#jadwalTable tbody tr');
@@ -386,15 +382,12 @@
                 const hari = row.getAttribute('data-hari');
                 const text = row.innerText.toLowerCase();
                 let visible = true;
-                // Filter hari
                 if (filter.value !== 'ALL' && hari !== filter.value) visible = false;
-                // Search
                 if (search && !text.includes(search)) visible = false;
                 row.classList.remove('today-row');
                 if (visible) {
                     row.style.display = '';
                     sks += parseInt(row.getAttribute('data-sks') || '0');
-                    // Highlight jadwal hari ini
                     if (hari === today) {
                         row.classList.add('today-row');
                         adaHariIni = true;
@@ -411,7 +404,6 @@
         searchInput.addEventListener('input', updateTable);
         updateTable();
 
-        // Floating Action Button ke atas
         document.getElementById('fabTop').onclick = function() {
             window.scrollTo({top:0, behavior:'smooth'});
         };
