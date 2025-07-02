@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
+     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
     <title>Jadwal Kuliah</title>
     <style>
@@ -42,6 +42,12 @@
             animation: tableFadeIn 1s 0.5s forwards;
             width: 90%;
             margin: 0 auto;
+        }
+        @media (max-width: 700px) {
+            #jadwalTable {
+                width: 700px;
+                min-width: 700px;
+            }
         }
         @keyframes tableFadeIn {
             to {
@@ -197,6 +203,7 @@
         </select>
         <span id="notifToday" style="margin-left:auto;color:#bfa13b;font-weight:bold;display:none;">Ada jadwal hari ini!</span>
     </div>
+    <div style="width:100%;overflow-x:auto;">
     <table id="jadwalTable" border="1" cellspacing="0" align="center">
         <thead bgcolor="#e2c976">
             <tr>
@@ -329,6 +336,7 @@
             </tr>
         </tbody>
     </table>
+    </div>
     <div style="width:90%;margin:auto;">
         <h5 id="totalSKS" style="margin:8px 0 0 0;">Total SKS : 23</h5>
     </div>
