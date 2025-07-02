@@ -534,186 +534,204 @@
     </div>
     <div class="fab" id="fabTop" title="Kembali ke atas">↑</div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('preloader').style.display = 'none';
-            document.getElementById('loginBox').style.display = "flex";
-            document.body.style.overflow = "hidden";
-        });
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('preloader').style.display = 'none';
+        document.getElementById('loginBox').style.display = "flex";
+        document.body.style.overflow = "hidden";
+    });
 
-        const fab = document.getElementById('fabTop');
-        window.addEventListener('scroll', () => {
-            if(window.scrollY > 100) fab.classList.remove('hide');
-            else fab.classList.add('hide');
-        });
-        fab.classList.add('hide');
-        fab.onclick = function() {
-            window.scrollTo({top:0, behavior:'smooth'});
-        };
+    const fab = document.getElementById('fabTop');
+    window.addEventListener('scroll', () => {
+        if(window.scrollY > 100) fab.classList.remove('hide');
+        else fab.classList.add('hide');
+    });
+    fab.classList.add('hide');
+    fab.onclick = function() {
+        window.scrollTo({top:0, behavior:'smooth'});
+    };
 
-        const toggleBtn = document.getElementById('toggleMode');
-        const themeBtn = document.getElementById('themeBtn');
-        const themePopup = document.getElementById('themePopup');
-        const colorPicker = document.getElementById('colorPicker');
-        const colorCircle = document.getElementById('colorCircle');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const closeToastBtn = document.querySelector('#toast .close-toast');
-        let dark = false;
+    const toggleBtn = document.getElementById('toggleMode');
+    const themeBtn = document.getElementById('themeBtn');
+    const themePopup = document.getElementById('themePopup');
+    const colorPicker = document.getElementById('colorPicker');
+    const colorCircle = document.getElementById('colorCircle');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const closeToastBtn = document.querySelector('#toast .close-toast');
+    let dark = false;
 
+    toggleBtn.classList.add('hide');
+    themeBtn.classList.add('hide');
+    themePopup.style.display = 'none';
+
+    const loginBox = document.getElementById('loginBox');
+    const loginForm = document.getElementById('loginForm');
+    const loginError = document.getElementById('loginError');
+    const toast = document.getElementById('toast');
+
+    const USERNAME = "riski";
+    const PASSWORD = "123";
+
+    loginForm.onsubmit = function(e) {
+        e.preventDefault();
+        const nama = document.getElementById('nama').value.trim();
+        const pass = document.getElementById('password').value;
+        if (nama.toLowerCase() === USERNAME && pass === PASSWORD) {
+            loginBox.style.display = "none";
+            document.body.style.overflow = "auto";
+            toggleBtn.classList.remove('hide');
+            themeBtn.classList.remove('hide');
+            logoutBtn.style.display = 'block';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        } else {
+            loginError.style.display = "block";
+        }
+    };
+
+    logoutBtn.onclick = function() {
+        loginBox.style.display = "flex";
+        document.body.style.overflow = "hidden";
         toggleBtn.classList.add('hide');
         themeBtn.classList.add('hide');
-        themePopup.style.display = 'none';
+        logoutBtn.style.display = 'none';
+    };
 
-        const loginBox = document.getElementById('loginBox');
-        const loginForm = document.getElementById('loginForm');
-        const loginError = document.getElementById('loginError');
-        const toast = document.getElementById('toast');
+    closeToastBtn.onclick = function() {
+        toast.style.display = 'none';
+    };
 
-        const USERNAME = "riski";
-        const PASSWORD = "123";
+    toggleBtn.onclick = function() {
+        dark = !dark;
+        if(dark) {
+            document.body.style.background = "linear-gradient(-45deg, #232946, #1a1a2e, #232946, #232946)";
+            toggleBtn.textContent = "☀️";
+        } else {
+            document.body.style.background = "linear-gradient(-45deg, #e0eafc, #cfdef3, #ffeeba, #bfa13b)";
+            toggleBtn.textContent = "🌙";
+        }
+    };
 
-        loginForm.onsubmit = function(e) {
-            e.preventDefault();
-            const nama = document.getElementById('nama').value.trim();
-            const pass = document.getElementById('password').value;
-            if (nama.toLowerCase() === USERNAME && pass === PASSWORD) {
-                loginBox.style.display = "none";
-                document.body.style.overflow = "auto";
-                toggleBtn.classList.remove('hide');
-                themeBtn.classList.remove('hide');
-                logoutBtn.style.display = 'block';
-                toast.style.display = 'block';
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 3000);
-            } else {
-                loginError.style.display = "block";
-            }
-        };
+    themeBtn.onclick = function(e) {
+        e.stopPropagation();
+        if(themePopup.classList.contains('show')) {
+            themePopup.classList.remove('show');
+            setTimeout(()=>themePopup.style.display='none', 350);
+        } else {
+            themePopup.style.display = 'flex';
+            setTimeout(()=>themePopup.classList.add('show'), 10);
+        }
+    };
+    document.addEventListener('click', function(e) {
+        if (themePopup.classList.contains('show') && !themePopup.contains(e.target) && e.target !== themeBtn) {
+            themePopup.classList.remove('show');
+            setTimeout(()=>themePopup.style.display='none', 350);
+        }
+    });
 
-        logoutBtn.onclick = function() {
-            loginBox.style.display = "flex";
-            document.body.style.overflow = "hidden";
-            toggleBtn.classList.add('hide');
-            themeBtn.classList.add('hide');
-            logoutBtn.style.display = 'none';
-        };
+    let colorPickerActive = false;
+    document.querySelector('.manual-row label').onclick = function(e) {
+        colorPickerActive = true;
+        colorPicker.focus();
+        colorPicker.click();
+    };
+    colorPicker.addEventListener('input', function() {
+        document.body.style.background = `linear-gradient(-45deg, ${this.value}, #cfdef3, #ffeeba, #bfa13b)`;
+        colorCircle.style.background = this.value;
+        dark = false;
+        toggleBtn.textContent = "🌙/☀️";
+    });
+    colorPicker.addEventListener('blur', function() {
+        colorPickerActive = false;
+    });
 
-        closeToastBtn.onclick = function() {
-            toast.style.display = 'none';
-        };
-
-        toggleBtn.onclick = function() {
-            dark = !dark;
-            if(dark) {
-                document.body.style.background = "linear-gradient(-45deg, #232946, #1a1a2e, #232946, #232946)";
-                toggleBtn.textContent = "☀️";
-            } else {
-                document.body.style.background = "linear-gradient(-45deg, #e0eafc, #cfdef3, #ffeeba, #bfa13b)";
-                toggleBtn.textContent = "🌙";
-            }
-        };
-
-        themeBtn.onclick = function(e) {
-            e.stopPropagation();
-            if(themePopup.classList.contains('show')) {
-                themePopup.classList.remove('show');
-                setTimeout(()=>themePopup.style.display='none', 350);
-            } else {
-                themePopup.style.display = 'flex';
-                setTimeout(()=>themePopup.classList.add('show'), 10);
-            }
-        };
-        document.addEventListener('click', function(e) {
-            if (themePopup.classList.contains('show') && !themePopup.contains(e.target) && e.target !== themeBtn) {
-                themePopup.classList.remove('show');
-                setTimeout(()=>themePopup.style.display='none', 350);
-            }
-        });
-
-        // Color picker: jangan tutup popup saat drag/geser, hanya saat blur/manual close
-        let colorPickerActive = false;
-        document.querySelector('.manual-row label').onclick = function(e) {
-            colorPickerActive = true;
-            colorPicker.focus();
-            colorPicker.click();
-        };
-        colorPicker.addEventListener('input', function() {
-            document.body.style.background = `linear-gradient(-45deg, ${this.value}, #cfdef3, #ffeeba, #bfa13b)`;
-            colorCircle.style.background = this.value;
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.onclick = function() {
+            const bg = btn.getAttribute('data-bg');
+            document.body.style.background = `linear-gradient(-45deg, ${bg})`;
             dark = false;
             toggleBtn.textContent = "🌙/☀️";
-        });
-        colorPicker.addEventListener('blur', function() {
-            colorPickerActive = false;
-        });
-
-        document.querySelectorAll('.preset-btn').forEach(btn => {
-            btn.onclick = function() {
-                const bg = btn.getAttribute('data-bg');
-                document.body.style.background = `linear-gradient(-45deg, ${bg})`;
-                dark = false;
-                toggleBtn.textContent = "🌙/☀️";
-                themePopup.classList.remove('show');
-                setTimeout(()=>themePopup.style.display='none', 350);
-            }
-        });
-
-        // Jangan tutup popup jika colorPicker sedang aktif
-        document.addEventListener('mousedown', function(e) {
-            if (themePopup.classList.contains('show') && !themePopup.contains(e.target) && e.target !== themeBtn && !colorPickerActive) {
-                themePopup.classList.remove('show');
-                setTimeout(()=>themePopup.style.display='none', 350);
-            }
-        });
-
-        // Reset search/filter
-        document.getElementById('resetSearch').onclick = function() {
-            document.getElementById('searchInput').value = '';
-            updateTable();
-        };
-        document.getElementById('resetFilter').onclick = function() {
-            document.getElementById('filterHari').value = 'ALL';
-            updateTable();
-        };
-
-        const filter = document.getElementById('filterHari');
-        const searchInput = document.getElementById('searchInput');
-        const rows = document.querySelectorAll('#jadwalTable tbody tr');
-        const totalSKS = document.getElementById('totalSKS');
-        const notifToday = document.getElementById('notifToday');
-
-        function updateTable() {
-            let sks = 0;
-            let adaHariIni = false;
-            const hariList = ["MINGGU","SENIN","SELASA","RABU","KAMIS","JUMAT","SABTU"];
-            const today = hariList[new Date().getDay()];
-            const search = searchInput.value.toLowerCase();
-
-            rows.forEach(row => {
-                const hari = row.getAttribute('data-hari');
-                const text = row.innerText.toLowerCase();
-                let visible = true;
-                if (filter.value !== 'ALL' && hari !== filter.value) visible = false;
-                if (search && !text.includes(search)) visible = false;
-                row.classList.remove('today-row');
-                if (visible) {
-                    row.style.display = '';
-                    sks += parseInt(row.getAttribute('data-sks') || '0');
-                    if (hari === today) {
-                        row.classList.add('today-row');
-                        adaHariIni = true;
-                    }
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-            totalSKS.textContent = 'Total SKS : ' + sks;
-            notifToday.style.display = adaHariIni ? 'inline' : 'none';
+            themePopup.classList.remove('show');
+            setTimeout(()=>themePopup.style.display='none', 350);
         }
+    });
 
-        filter.addEventListener('change', updateTable);
-        searchInput.addEventListener('input', updateTable);
+    document.addEventListener('mousedown', function(e) {
+        if (themePopup.classList.contains('show') && !themePopup.contains(e.target) && e.target !== themeBtn && !colorPickerActive) {
+            themePopup.classList.remove('show');
+            setTimeout(()=>themePopup.style.display='none', 350);
+        }
+    });
+
+    document.getElementById('resetSearch').onclick = function() {
+        document.getElementById('searchInput').value = '';
         updateTable();
-    </script>
+    };
+    document.getElementById('resetFilter').onclick = function() {
+        document.getElementById('filterHari').value = 'ALL';
+        updateTable();
+    };
+
+    const filter = document.getElementById('filterHari');
+    const searchInput = document.getElementById('searchInput');
+    const rows = document.querySelectorAll('#jadwalTable tbody tr');
+    const totalSKS = document.getElementById('totalSKS');
+    const notifToday = document.getElementById('notifToday');
+
+    function parseJam(jamStr) {
+        let [start, end] = jamStr.split('-');
+        function toMinutes(jam) {
+            let [h, m] = jam.trim().split('.').map(Number);
+            return h * 60 + m;
+        }
+        return [toMinutes(start), toMinutes(end)];
+    }
+
+    function isNowInJadwal(jamStr) {
+        let now = new Date();
+        let nowMinutes = now.getHours() * 60 + now.getMinutes();
+        let [start, end] = parseJam(jamStr);
+        return nowMinutes >= start && nowMinutes <= end;
+    }
+
+    function updateTable() {
+        let sks = 0;
+        let adaJadwalSekarang = false;
+        const hariList = ["MINGGU","SENIN","SELASA","RABU","KAMIS","JUMAT","SABTU"];
+        const today = hariList[new Date().getDay()];
+        const search = searchInput.value.toLowerCase();
+
+        rows.forEach(row => {
+            const hari = row.getAttribute('data-hari');
+            const text = row.innerText.toLowerCase();
+            let visible = true;
+            if (filter.value !== 'ALL' && hari !== filter.value) visible = false;
+            if (search && !text.includes(search)) visible = false;
+            row.classList.remove('today-row');
+            if (visible) {
+                row.style.display = '';
+                sks += parseInt(row.getAttribute('data-sks') || '0');
+                if (hari === today) {
+                    const jam = row.children[4].textContent.trim();
+                    if (isNowInJadwal(jam)) {
+                        row.classList.add('today-row');
+                        adaJadwalSekarang = true;
+                    }
+                }
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        totalSKS.textContent = 'Total SKS : ' + sks;
+        notifToday.style.display = adaJadwalSekarang ? 'inline' : 'none';
+    }
+
+    filter.addEventListener('change', updateTable);
+    searchInput.addEventListener('input', updateTable);
+
+    setInterval(updateTable, 60000);
+    updateTable();
+</script>
 </body>
 </html>
