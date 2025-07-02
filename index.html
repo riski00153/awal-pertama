@@ -1,37 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
     <title>Jadwal Kuliah</title>
     <style>
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        button, .fab {
-            position: relative;
-            overflow: hidden;
+        @keyframes gradientMove {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
         }
-        button:active::after, .fab:active::after {
-            content: "";
-            position: absolute;
-            left: 50%; top: 50%;
-            width: 0; height: 0;
-            background: rgba(255,255,255,0.4);
-            border-radius: 100%;
-            transform: translate(-50%,-50%);
-            animation: ripple 0.4s linear;
+        @keyframes fadeInBody {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
-        .filter-bar select {
-            background: #fffbe7;
-            font-weight: bold;
-            border: 2px solid #e2c976;
-            transition: border 0.2s, box-shadow 0.2s;
+        @keyframes tableFadeIn {
+            to { opacity: 1; transform: none; }
         }
-        .filter-bar select:focus {
-            border: 2px solid #bfa13b;
-            box-shadow: 0 0 4px #ffeeba;
-        }
-        @keyframes ripple {
-            to { width: 200%; height: 200%; opacity: 0; }
+        @keyframes highlightToday {
+            from { background: #ffeeba; color: #232946; }
+            to { background: #bfa13b; color: #fff; }
         }
         html, body {
             height: 100%;
@@ -44,18 +33,10 @@
         body {
             background: linear-gradient(-45deg, #e0eafc, #cfdef3, #ffeeba, #bfa13b);
             background-size: 400% 400%;
-            animation: gradientMove 10s ease infinite, fadeInBody 1s;
+            animation: gradientMove 10s ease-in-out infinite, fadeInBody 1s;
             min-height: 100vh;
             font-family: 'Segoe UI', Arial, sans-serif;
-        }
-        @keyframes gradientMove {
-            0% {background-position: 0% 50%;}
-            50% {background-position: 100% 50%;}
-            100% {background-position: 0% 50%;}
-        }
-        @keyframes fadeInBody {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            transition: background 0.7s cubic-bezier(.4,2,.6,1);
         }
         table, .filter-bar, .search-bar {
             background: rgba(255, 255, 255, 0.25);
@@ -63,6 +44,7 @@
             -webkit-backdrop-filter: blur(8px);
             border-radius: 16px;
             box-shadow: 0 8px 24px rgba(100,140,200,0.15);
+            transition: box-shadow 0.4s cubic-bezier(.4,2,.6,1), background 0.4s;
         }
         #jadwalTable {
             opacity: 0;
@@ -72,6 +54,7 @@
             margin: 0 auto;
             min-width: 700px;
             max-width: 100%;
+            transition: box-shadow 0.4s, background 0.4s;
         }
         @media (max-width: 700px) {
             #jadwalTable, .filter-bar, .search-bar { width: 98%; }
@@ -79,15 +62,9 @@
             th, td { font-size: 0.95em; }
             #loginForm { min-width:180px; }
         }
-        @keyframes tableFadeIn {
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-        th, td { padding: 8px; }
+        th, td { padding: 8px; transition: background 0.3s, color 0.3s; }
         tr {
-            transition: background 0.3s, transform 0.2s;
+            transition: background 0.4s cubic-bezier(.4,2,.6,1), transform 0.3s cubic-bezier(.4,2,.6,1), box-shadow 0.3s;
         }
         tr:hover {
             background: #ffeeba;
@@ -102,6 +79,7 @@
             gap: 8px;
             padding: 8px 12px;
             animation: fadeInBody 1.2s;
+            transition: box-shadow 0.4s, background 0.4s;
         }
         .search-bar {
             margin-bottom: 0;
@@ -112,6 +90,22 @@
             border-radius: 6px;
             border: 1px solid #e2c976;
             font-size: 1em;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+        .reset-btn {
+            background: #fffbe7;
+            border: 1px solid #e2c976;
+            border-radius: 6px;
+            padding: 4px 10px;
+            margin-left: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .reset-btn:hover {
+            background: #ffeeba;
+            color: #232946;
+            box-shadow: 0 2px 8px #ffeeba;
         }
         select, button {
             padding: 4px 8px;
@@ -121,17 +115,34 @@
         }
         select:focus, .search-bar input:focus {
             border: 1.5px solid #bfa13b;
-            box-shadow: 0 0 4px #ffeeba;
+            box-shadow: 0 0 8px #ffeeba;
             outline: none;
+        }
+        button, .fab {
+            position: relative;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+        button:active::after, .fab:active::after {
+            content: "";
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,0.4);
+            border-radius: 100%;
+            transform: translate(-50%,-50%);
+            animation: ripple 0.4s linear;
         }
         button:hover, .fab:hover {
             background: #bfa13b;
             color: #fff;
-            box-shadow: 0 2px 8px #ffeeba;
+            box-shadow: 0 2px 12px #ffeeba;
+            transform: translateY(-2px) scale(1.04);
         }
         h3 {
             text-shadow: 0 2px 8px #fffbe7cc;
             letter-spacing: 1px;
+            transition: text-shadow 0.3s;
         }
         #totalSKS {
             color: #bfa13b;
@@ -145,6 +156,7 @@
             display:flex;align-items:center;justify-content:center;
             background:#232946;
             z-index:99;
+            animation: fadeInBody 0.7s;
         }
         #loginForm {
             background:rgba(40,60,90,0.98);
@@ -152,9 +164,11 @@
             border-radius:16px;
             box-shadow:0 8px 32px rgba(40,60,90,0.25);
             display:flex;flex-direction:column;gap:12px;min-width:260px;
+            animation: fadeInBody 0.7s;
+            transition: box-shadow 0.4s;
         }
         #loginForm h3 { color:#fff; margin-bottom:8px; text-align:center;}
-        #loginForm input {padding:8px;border-radius:6px;border:1px solid #e2c976;}
+        #loginForm input {padding:8px;border-radius:6px;border:1px solid #e2c976;transition: border 0.3s;}
         #loginForm button {padding:8px;border-radius:6px;background:#e2c976;border:none;font-weight:bold;cursor:pointer;}
         #loginError {color:#ffb3b3;display:none;font-size:0.9em;text-align:center;}
         #toast {
@@ -170,6 +184,16 @@
             box-shadow:0 2px 8px #232946b0;
             z-index:999;
             font-size:1.1em;
+            animation: fadeInBody 0.5s;
+        }
+        #toast .close-toast {
+            margin-left: 16px;
+            background: none;
+            border: none;
+            color: #ffeeba;
+            font-size: 1.2em;
+            cursor: pointer;
+            vertical-align: middle;
         }
         .fab {
             position:fixed;
@@ -187,7 +211,7 @@
             box-shadow:0 4px 16px rgba(100,140,200,0.18);
             cursor:pointer;
             z-index:1000;
-            transition: background 0.2s, color 0.2s;
+            transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
         }
         .fab.hide {
             display: none !important;
@@ -197,6 +221,7 @@
             color: #fff;
             font-weight: bold;
             animation: highlightToday 1.5s;
+            transition: background 0.5s, color 0.5s;
         }
         .hide { display: none !important; }
         .theme-popup {
@@ -212,7 +237,14 @@
             flex-direction: column;
             gap: 12px;
             min-width: 200px;
-            animation: fadeInBody 0.3s;
+            opacity: 0;
+            transform: translateY(-10px) scale(0.98);
+            transition: opacity 0.35s cubic-bezier(.4,2,.6,1), transform 0.35s cubic-bezier(.4,2,.6,1);
+        }
+        .theme-popup.show {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0) scale(1);
         }
         .theme-popup .preset-row {
             display: flex;
@@ -227,22 +259,39 @@
             cursor:pointer;
             box-shadow:0 2px 8px #23294644;
             outline:none;
-            transition:transform 0.15s;
+            transition:transform 0.15s, box-shadow 0.2s;
             display:flex;
             align-items:center;
             justify-content:center;
         }
         .theme-popup .preset-btn:active {
             transform:scale(0.92);
+            box-shadow:0 0 0 2px #bfa13b;
         }
         .theme-popup .manual-row {
             display: flex;
             align-items: center;
             gap: 8px;
+            position: relative;
         }
         .theme-popup label {
             font-size: 0.98em;
             color: #232946;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .theme-popup .color-circle {
+            display:inline-block;
+            width:28px;
+            height:28px;
+            border-radius:50%;
+            background:#ffeeba;
+            border:1.5px solid #bfa13b;
+            vertical-align:middle;
+            transition: background 0.3s, border 0.3s;
         }
         .theme-popup input[type="color"] {
             width: 32px;
@@ -251,6 +300,47 @@
             background: none;
             padding: 0;
             cursor: pointer;
+            opacity: 0;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        #logoutBtn {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 1002;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            background: #232946;
+            color: #ffeeba;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 8px #23294644;
+            display: none;
+            transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+        }
+        #logoutBtn:hover {
+            background: #bfa13b;
+            color: #fff;
+            box-shadow: 0 2px 12px #ffeeba;
+            transform: translateY(-2px) scale(1.04);
+        }
+        @media (max-width: 600px) {
+            .theme-popup {
+                right: 8px;
+                left: 8px;
+                min-width: unset;
+                width: auto;
+                padding: 12px 8px 8px 8px;
+            }
+            #toggleMode, #themeBtn {
+                right: 8px;
+            }
+            #logoutBtn {
+                left: 8px;
+            }
         }
     </style>
 </head>
@@ -260,6 +350,7 @@
     </div>
     <button id="toggleMode" class="hide" style="position:fixed;top:24px;right:24px;z-index:1001;padding:8px 16px;border-radius:8px;border:none;background:#232946;color:#ffeeba;font-weight:bold;cursor:pointer;box-shadow:0 2px 8px #23294644;">🌙/☀️</button>
     <button id="themeBtn" class="hide" style="position:fixed;top:70px;right:24px;z-index:1001;width:36px;height:36px;border-radius:50%;border:none;background:#ffeeba;box-shadow:0 2px 8px #23294644;cursor:pointer;font-size:1.3em;display:flex;align-items:center;justify-content:center;">🎨</button>
+    <button id="logoutBtn">Logout</button>
     <div id="themePopup" class="theme-popup">
         <div class="preset-row">
             <button class="preset-btn" style="background:#e0eafc;" data-bg="#e0eafc,#cfdef3,#ffeeba,#bfa13b"></button>
@@ -269,8 +360,11 @@
             <button class="preset-btn" style="background:#c8e6c9;" data-bg="#c8e6c9,#81c784,#fff59d,#ffcc80"></button>
         </div>
         <div class="manual-row">
-            <label for="colorPicker" style="cursor:pointer;">Pilih Warna Sendiri</label>
-            <input type="color" id="colorPicker">
+            <label for="colorPicker">
+                Pilih Warna Sendiri
+                <span class="color-circle" id="colorCircle"></span>
+            </label>
+            <input type="color" id="colorPicker" tabindex="-1">
         </div>
     </div>
     <div id="loginBox">
@@ -282,10 +376,11 @@
             <span id="loginError">Nama atau password salah!</span>
         </form>
     </div>
-    <div id="toast">Login Berhasil!</div>
+    <div id="toast">Login Berhasil! <button class="close-toast" title="Tutup">&times;</button></div>
     <h3 align="center">Jadwal Kuliah</h3>
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Cari kode, mata kuliah, atau dosen...">
+        <button class="reset-btn" id="resetSearch" title="Reset Pencarian">✕</button>
     </div>
     <div class="filter-bar">
         <label for="filterHari">Filter Hari: </label>
@@ -297,6 +392,7 @@
             <option value="KAMIS">Kamis</option>
             <option value="JUMAT">Jumat</option>
         </select>
+        <button class="reset-btn" id="resetFilter" title="Reset Filter">✕</button>
         <span id="notifToday" style="margin-left:auto;color:#bfa13b;font-weight:bold;display:none;">Ada jadwal hari ini!</span>
     </div>
     <div style="width:100%;overflow-x:auto;">
@@ -458,6 +554,9 @@
         const themeBtn = document.getElementById('themeBtn');
         const themePopup = document.getElementById('themePopup');
         const colorPicker = document.getElementById('colorPicker');
+        const colorCircle = document.getElementById('colorCircle');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const closeToastBtn = document.querySelector('#toast .close-toast');
         let dark = false;
 
         toggleBtn.classList.add('hide');
@@ -481,13 +580,26 @@
                 document.body.style.overflow = "auto";
                 toggleBtn.classList.remove('hide');
                 themeBtn.classList.remove('hide');
+                logoutBtn.style.display = 'block';
                 toast.style.display = 'block';
                 setTimeout(() => {
                     toast.style.display = 'none';
-                }, 2000);
+                }, 3000);
             } else {
                 loginError.style.display = "block";
             }
+        };
+
+        logoutBtn.onclick = function() {
+            loginBox.style.display = "flex";
+            document.body.style.overflow = "hidden";
+            toggleBtn.classList.add('hide');
+            themeBtn.classList.add('hide');
+            logoutBtn.style.display = 'none';
+        };
+
+        closeToastBtn.onclick = function() {
+            toast.style.display = 'none';
         };
 
         toggleBtn.onclick = function() {
@@ -503,12 +615,36 @@
 
         themeBtn.onclick = function(e) {
             e.stopPropagation();
-            themePopup.style.display = themePopup.style.display === 'flex' ? 'none' : 'flex';
+            if(themePopup.classList.contains('show')) {
+                themePopup.classList.remove('show');
+                setTimeout(()=>themePopup.style.display='none', 350);
+            } else {
+                themePopup.style.display = 'flex';
+                setTimeout(()=>themePopup.classList.add('show'), 10);
+            }
         };
         document.addEventListener('click', function(e) {
-            if (themePopup.style.display === 'flex' && !themePopup.contains(e.target) && e.target !== themeBtn) {
-                themePopup.style.display = 'none';
+            if (themePopup.classList.contains('show') && !themePopup.contains(e.target) && e.target !== themeBtn) {
+                themePopup.classList.remove('show');
+                setTimeout(()=>themePopup.style.display='none', 350);
             }
+        });
+
+        // Color picker: jangan tutup popup saat drag/geser, hanya saat blur/manual close
+        let colorPickerActive = false;
+        document.querySelector('.manual-row label').onclick = function(e) {
+            colorPickerActive = true;
+            colorPicker.focus();
+            colorPicker.click();
+        };
+        colorPicker.addEventListener('input', function() {
+            document.body.style.background = `linear-gradient(-45deg, ${this.value}, #cfdef3, #ffeeba, #bfa13b)`;
+            colorCircle.style.background = this.value;
+            dark = false;
+            toggleBtn.textContent = "🌙/☀️";
+        });
+        colorPicker.addEventListener('blur', function() {
+            colorPickerActive = false;
         });
 
         document.querySelectorAll('.preset-btn').forEach(btn => {
@@ -517,15 +653,27 @@
                 document.body.style.background = `linear-gradient(-45deg, ${bg})`;
                 dark = false;
                 toggleBtn.textContent = "🌙/☀️";
-                themePopup.style.display = 'none';
+                themePopup.classList.remove('show');
+                setTimeout(()=>themePopup.style.display='none', 350);
             }
         });
 
-        colorPicker.oninput = function() {
-            document.body.style.background = `linear-gradient(-45deg, ${this.value}, #cfdef3, #ffeeba, #bfa13b)`;
-            dark = false;
-            toggleBtn.textContent = "🌙/☀️";
-            themePopup.style.display = 'none';
+        // Jangan tutup popup jika colorPicker sedang aktif
+        document.addEventListener('mousedown', function(e) {
+            if (themePopup.classList.contains('show') && !themePopup.contains(e.target) && e.target !== themeBtn && !colorPickerActive) {
+                themePopup.classList.remove('show');
+                setTimeout(()=>themePopup.style.display='none', 350);
+            }
+        });
+
+        // Reset search/filter
+        document.getElementById('resetSearch').onclick = function() {
+            document.getElementById('searchInput').value = '';
+            updateTable();
+        };
+        document.getElementById('resetFilter').onclick = function() {
+            document.getElementById('filterHari').value = 'ALL';
+            updateTable();
         };
 
         const filter = document.getElementById('filterHari');
@@ -567,3 +715,5 @@
         searchInput.addEventListener('input', updateTable);
         updateTable();
     </script>
+</body>
+</html>
