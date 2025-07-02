@@ -5,14 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
     <title>Jadwal Kuliah</title>
     <style>
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        button, .fab {
+            position: relative;
+            overflow: hidden;
+        }
+        button:active::after, .fab:active::after {
+            content: "";
+            position: absolute;
+            left: 50%; top: 50%;
+            width: 0; height: 0;
+            background: rgba(255,255,255,0.4);
+            border-radius: 100%;
+            transform: translate(-50%,-50%);
+            animation: ripple 0.4s linear;
+        }
+        .filter-bar select {
+            background: #fffbe7;
+            font-weight: bold;
+            border: 2px solid #e2c976;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+        .filter-bar select:focus {
+            border: 2px solid #bfa13b;
+            box-shadow: 0 0 4px #ffeeba;
+        }
+        @keyframes ripple {
+            to { width: 200%; height: 200%; opacity: 0; }
+        }
         html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        box-sizing: border-box;
-    }
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
         body {
             background: linear-gradient(-45deg, #e0eafc, #cfdef3, #ffeeba, #bfa13b);
             background-size: 400% 400%;
@@ -42,12 +70,14 @@
             animation: tableFadeIn 1s 0.5s forwards;
             width: 90%;
             margin: 0 auto;
+            min-width: 700px;
+            max-width: 100%;
         }
         @media (max-width: 700px) {
-            #jadwalTable {
-                width: 700px;
-                min-width: 700px;
-            }
+            #jadwalTable, .filter-bar, .search-bar { width: 98%; }
+            #jadwalTable { width: 700px; min-width: 700px; }
+            th, td { font-size: 0.95em; }
+            #loginForm { min-width:180px; }
         }
         @keyframes tableFadeIn {
             to {
@@ -159,23 +189,90 @@
             z-index:1000;
             transition: background 0.2s, color 0.2s;
         }
-        @media (max-width: 700px) {
-            #jadwalTable, .filter-bar, .search-bar { width: 98%; }
-            th, td { font-size: 0.95em; }
-            #loginForm { min-width:180px; }
-        }.today-row {
+        .fab.hide {
+            display: none !important;
+        }
+        .today-row {
             background: #bfa13b !important;
             color: #fff;
             font-weight: bold;
             animation: highlightToday 1.5s;
         }
-        @keyframes highlightToday {
-            from { background: #ffeeba; color: #232946; }
-            to { background: #bfa13b; color: #fff; }
+        .hide { display: none !important; }
+        .theme-popup {
+            position: fixed;
+            top: 70px;
+            right: 24px;
+            z-index: 2002;
+            background: #fffbe7;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(100,140,200,0.18);
+            padding: 18px 18px 12px 18px;
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 200px;
+            animation: fadeInBody 0.3s;
+        }
+        .theme-popup .preset-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .theme-popup .preset-btn {
+            width:32px;
+            height:32px;
+            border-radius:50%;
+            border:none;
+            cursor:pointer;
+            box-shadow:0 2px 8px #23294644;
+            outline:none;
+            transition:transform 0.15s;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        }
+        .theme-popup .preset-btn:active {
+            transform:scale(0.92);
+        }
+        .theme-popup .manual-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .theme-popup label {
+            font-size: 0.98em;
+            color: #232946;
+        }
+        .theme-popup input[type="color"] {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
+    <div id="preloader" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:2000;background:#232946;display:flex;align-items:center;justify-content:center;">
+        <div style="border:6px solid #ffeeba;border-top:6px solid #232946;border-radius:50%;width:48px;height:48px;animation:spin 1s linear infinite;"></div>
+    </div>
+    <button id="toggleMode" class="hide" style="position:fixed;top:24px;right:24px;z-index:1001;padding:8px 16px;border-radius:8px;border:none;background:#232946;color:#ffeeba;font-weight:bold;cursor:pointer;box-shadow:0 2px 8px #23294644;">🌙/☀️</button>
+    <button id="themeBtn" class="hide" style="position:fixed;top:70px;right:24px;z-index:1001;width:36px;height:36px;border-radius:50%;border:none;background:#ffeeba;box-shadow:0 2px 8px #23294644;cursor:pointer;font-size:1.3em;display:flex;align-items:center;justify-content:center;">🎨</button>
+    <div id="themePopup" class="theme-popup">
+        <div class="preset-row">
+            <button class="preset-btn" style="background:#e0eafc;" data-bg="#e0eafc,#cfdef3,#ffeeba,#bfa13b"></button>
+            <button class="preset-btn" style="background:#232946;" data-bg="#232946,#1a1a2e,#232946,#232946"></button>
+            <button class="preset-btn" style="background:#a7ffeb;" data-bg="#a7ffeb,#64b5f6,#ffd6e0,#ffb74d"></button>
+            <button class="preset-btn" style="background:#f8bbd0;" data-bg="#f8bbd0,#f48fb1,#ce93d8,#b39ddb"></button>
+            <button class="preset-btn" style="background:#c8e6c9;" data-bg="#c8e6c9,#81c784,#fff59d,#ffcc80"></button>
+        </div>
+        <div class="manual-row">
+            <label for="colorPicker" style="cursor:pointer;">Pilih Warna Sendiri</label>
+            <input type="color" id="colorPicker">
+        </div>
+    </div>
     <div id="loginBox">
         <form id="loginForm">
             <h3>Login Jadwal Kuliah</h3>
@@ -186,7 +283,6 @@
         </form>
     </div>
     <div id="toast">Login Berhasil!</div>
-
     <h3 align="center">Jadwal Kuliah</h3>
     <div class="search-bar">
         <input type="text" id="searchInput" placeholder="Cari kode, mata kuliah, atau dosen...">
@@ -342,10 +438,31 @@
     </div>
     <div class="fab" id="fabTop" title="Kembali ke atas">↑</div>
     <script>
-        const hour = new Date().getHours();
-        if (hour >= 18 || hour < 6) {
-            document.body.style.background = "linear-gradient(-45deg, #232946, #1a1a2e, #232946, #232946)";
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('preloader').style.display = 'none';
+            document.getElementById('loginBox').style.display = "flex";
+            document.body.style.overflow = "hidden";
+        });
+
+        const fab = document.getElementById('fabTop');
+        window.addEventListener('scroll', () => {
+            if(window.scrollY > 100) fab.classList.remove('hide');
+            else fab.classList.add('hide');
+        });
+        fab.classList.add('hide');
+        fab.onclick = function() {
+            window.scrollTo({top:0, behavior:'smooth'});
+        };
+
+        const toggleBtn = document.getElementById('toggleMode');
+        const themeBtn = document.getElementById('themeBtn');
+        const themePopup = document.getElementById('themePopup');
+        const colorPicker = document.getElementById('colorPicker');
+        let dark = false;
+
+        toggleBtn.classList.add('hide');
+        themeBtn.classList.add('hide');
+        themePopup.style.display = 'none';
 
         const loginBox = document.getElementById('loginBox');
         const loginForm = document.getElementById('loginForm');
@@ -362,7 +479,8 @@
             if (nama.toLowerCase() === USERNAME && pass === PASSWORD) {
                 loginBox.style.display = "none";
                 document.body.style.overflow = "auto";
-                // Toast notification
+                toggleBtn.classList.remove('hide');
+                themeBtn.classList.remove('hide');
                 toast.style.display = 'block';
                 setTimeout(() => {
                     toast.style.display = 'none';
@@ -371,7 +489,44 @@
                 loginError.style.display = "block";
             }
         };
-        document.body.style.overflow = "hidden";
+
+        toggleBtn.onclick = function() {
+            dark = !dark;
+            if(dark) {
+                document.body.style.background = "linear-gradient(-45deg, #232946, #1a1a2e, #232946, #232946)";
+                toggleBtn.textContent = "☀️";
+            } else {
+                document.body.style.background = "linear-gradient(-45deg, #e0eafc, #cfdef3, #ffeeba, #bfa13b)";
+                toggleBtn.textContent = "🌙";
+            }
+        };
+
+        themeBtn.onclick = function(e) {
+            e.stopPropagation();
+            themePopup.style.display = themePopup.style.display === 'flex' ? 'none' : 'flex';
+        };
+        document.addEventListener('click', function(e) {
+            if (themePopup.style.display === 'flex' && !themePopup.contains(e.target) && e.target !== themeBtn) {
+                themePopup.style.display = 'none';
+            }
+        });
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.onclick = function() {
+                const bg = btn.getAttribute('data-bg');
+                document.body.style.background = `linear-gradient(-45deg, ${bg})`;
+                dark = false;
+                toggleBtn.textContent = "🌙/☀️";
+                themePopup.style.display = 'none';
+            }
+        });
+
+        colorPicker.oninput = function() {
+            document.body.style.background = `linear-gradient(-45deg, ${this.value}, #cfdef3, #ffeeba, #bfa13b)`;
+            dark = false;
+            toggleBtn.textContent = "🌙/☀️";
+            themePopup.style.display = 'none';
+        };
 
         const filter = document.getElementById('filterHari');
         const searchInput = document.getElementById('searchInput');
@@ -411,10 +566,4 @@
         filter.addEventListener('change', updateTable);
         searchInput.addEventListener('input', updateTable);
         updateTable();
-
-        document.getElementById('fabTop').onclick = function() {
-            window.scrollTo({top:0, behavior:'smooth'});
-        };
     </script>
-</body>
-</html>
